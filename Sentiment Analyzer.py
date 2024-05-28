@@ -13,14 +13,14 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from IPython.display import display
 
 
-posts = []
-title = []
-selftext = []
-pos_score = []
-neg_score = []
-neu_score = []
-overall_rating = []
-testing = []
+# posts = []
+# title = []
+# selftext = []
+# pos_score = []
+# neg_score = []
+# neu_score = []
+# overall_rating = []
+# testing = []
 
 async def main():
     # The number of post actually being used, as we discard videos
@@ -45,20 +45,41 @@ async def main():
         #     "text": submission.selftext,
         # })
         # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, commpos, comneg, comneu, comrating, date]
-        title.append(submission.title)
+        title = submission.title
+        sentiment_dict = sent_analyzer.polarity_scores(title)
+        title_neg_score = sentiment_dict['neg'] * 100
+        title_pos_score = sentiment_dict['pos'] * 100
+        title_neu_score = sentiment_dict['neu'] * 100
+        if sentiment_dict['compound'] >= 0.05:
+            title_overall_rating = "Positive"
+        elif sentiment_dict['compound'] <= -0.05:
+            title_overall_rating = "Negative"
+        else:
+            title_overall_rating = "Neutral"
         # Analyzes text if post is a text post
         if submission.is_self:
-            selftext.append(submission.selftext)
+            #selftext.append(submission.selftext)
             sentiment_dict = sent_analyzer.polarity_scores(submission.selftext)
-            neg_score.append(sentiment_dict['neg'] * 100)
-            pos_score.append(sentiment_dict['pos'] * 100)
-            neu_score.append(sentiment_dict['neu'] * 100)
+            text_neg_score = sentiment_dict['neg'] * 100
+            text_pos_score = sentiment_dict['pos'] * 100
+            text_neu_score = sentiment_dict['neu'] * 100
             if sentiment_dict['compound'] >= 0.05:
-                overall_rating.append("Positive")
+                text_overall_rating = "Positive"
             elif sentiment_dict['compound'] <= -0.05:
-                overall_rating.append("Negative")
+                text_overall_rating = "Negative"
             else:
-                overall_rating.append("Neutral")
+                text_overall_rating = "Neutral"
+
+        #comment_neu_avg =
+
+        num_com = 5
+
+        #https://asyncpraw.readthedocs.io/en/stable/tutorials/comments.html#extracting-comments
+
+        comments = await submission.comments()
+        await comments.replace_more(limit=0)
+        for top_level_comment in comments:
+            print(top_level_comment.author)
 
         posts_grabbed += 1
 
@@ -80,12 +101,12 @@ async def main():
         '''
     frame = pandas.DataFrame(title)
     frame.columns=["Title"]
-    #if selftext ==:
-        #frame['Text'] = selftext
-    frame['Positive'] = pos_score
-    frame['Negative'] = neg_score
-    frame['Neutral'] = neu_score
-    frame['Overall'] = overall_rating
+    # #if selftext ==:
+    #     #frame['Text'] = selftext
+    # frame['Positive'] = pos_score
+    # frame['Negative'] = neg_score
+    # frame['Neutral'] = neu_score
+    # frame['Overall'] = overall_rating
 
     pandas.set_option("display.max_columns", None)
     display(frame)
