@@ -27,10 +27,11 @@ async def main():
     # TEMP CREATE DATA FRAME
     # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, textrating,commpos, comneg, comneu, comrating, date]
     frame = pandas.DataFrame(columns=['titlepos', 'titleneg', 'titleneu', 'titlerating', 'textpos', 'textneg', 'textneu', 'textrating','commpos', 'comneg', 'comneu', 'comrating', 'date'])
-    #frame.columns = ["Title"]
-
     pandas.set_option("display.max_columns", None)
     display(frame)
+
+    file1 = open("MyFile1.txt", "w+")
+    file1.write("titlepos\t titleneg\t titleneu\t titlerating\t textpos\t textneg\t textneu\t textrating\t commpos\t comneg\t comneu\t comrating\t date\n")
 
     # The number of post actually being used, as we discard videos
     posts_grabbed = 0
@@ -44,8 +45,8 @@ async def main():
 
     # Gets the subreddit and loads in the hot submissions into a dictionary
     #subreddit = await reddit.Front()
-    subreddit = await reddit.subreddit("popular")
-    async for submission in subreddit.top(limit=5, time_filter="day"):
+    subreddit = await reddit.subreddit("politics")
+    async for submission in subreddit.top(limit=20, time_filter="day"):
         # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, commpos, comneg, comneu, comrating, date]
         title = submission.title
         print(title)
@@ -99,7 +100,7 @@ async def main():
 
         # For a number of comments, iterate through them, recording sentiment
         i = 0
-        while (i < num_com):
+        while (i < num_com and i < len(comments)):
         #for i in num_com:
             #TESTING REMOVE LATER
             com_overall_rating = ""
@@ -170,13 +171,16 @@ async def main():
         date = datetime.datetime.now()
         #print(date.strftime("%x"))
 
-        # Add row to data frame
-        frame.loc[len(frame.index)] = [title_pos_score, title_neg_score, title_neu_score, title_overall_rating, text_pos_score, text_neg_score, text_neu_score, text_overall_rating, total_com_pos, total_com_neg, total_com_neu, com_overall_rating, date.strftime("%x")]
+        # Add row to data frame if there are enough comments
+        if (com_rating_neu + com_rating_neg + com_rating_pos == 5):
+            file1.write(str(round(title_pos_score, 2)) + "\t" + str(round(title_neg_score, 2)) + "\t" + str(round(title_neu_score, 2)) + "\t" + str(title_overall_rating) + "\t" + str(round(text_pos_score, 2)) + "\t" + str(round(text_neg_score, 2)) + "\t" + str(round(text_neu_score, 2)) + "\t" + str(text_overall_rating) + "\t" + str(round(total_com_pos, 2)) + "\t" + str(round(total_com_neg, 2)) + "\t" + str(round(total_com_neu, 2)) + "\t" + str(com_overall_rating) + "\t" + date.strftime("%x") + "\n")
+            frame.loc[len(frame.index)] = [title_pos_score, title_neg_score, title_neu_score, title_overall_rating, text_pos_score, text_neg_score, text_neu_score, text_overall_rating, total_com_pos, total_com_neg, total_com_neu, com_overall_rating, date.strftime("%x")]
 
 
     await reddit.close()
 
     display(frame)
+    file1.close()
 
 
 def regular():
