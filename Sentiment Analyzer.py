@@ -171,10 +171,25 @@ async def main():
         date = datetime.datetime.now()
         #print(date.strftime("%x"))
 
+        # Rounding values
+        title_pos_score = round(title_pos_score, 2)
+        title_neg_score = round(title_neg_score, 2)
+        title_neu_score = round(title_neu_score, 2)
+
+        if submission.is_self:
+            text_pos_score = round(text_pos_score, 2)
+            text_neg_score = round(text_neg_score, 2)
+            text_neu_score = round(text_neu_score, 2)
+
+        total_com_pos = round(total_com_pos, 2)
+        total_com_neg = round(total_com_neg, 2)
+        total_com_neu = round(total_com_neu, 2)
+
         # Add row to data frame if there are enough comments
         if (com_rating_neu + com_rating_neg + com_rating_pos == 5):
-            file1.write(str(round(title_pos_score, 2)) + "\t" + str(round(title_neg_score, 2)) + "\t" + str(round(title_neu_score, 2)) + "\t" + str(title_overall_rating) + "\t" + str(round(text_pos_score, 2)) + "\t" + str(round(text_neg_score, 2)) + "\t" + str(round(text_neu_score, 2)) + "\t" + str(text_overall_rating) + "\t" + str(round(total_com_pos, 2)) + "\t" + str(round(total_com_neg, 2)) + "\t" + str(round(total_com_neu, 2)) + "\t" + str(com_overall_rating) + "\t" + date.strftime("%x") + "\n")
+            file1.write(str(title_pos_score) + "\t\t\t\t\t" + str(title_neg_score) + "\t\t\t\t\t" + str(title_neu_score) + "\t\t\t\t\t" + str(title_overall_rating) + "\t\t\t\t\t" + str(text_pos_score) + "\t\t\t\t\t" + str(text_neg_score) + "\t\t\t\t\t" + str(text_neu_score) + "\t\t\t\t\t" + str(text_overall_rating) + "\t\t\t\t\t" + str(total_com_pos) + "\t\t\t\t\t" + str(total_com_neg) + "\t\t\t\t\t" + str(total_com_neu) + "\t\t\t\t\t" + str(com_overall_rating) + "\t\t\t\t\t" + date.strftime("%x") + "\n")
             frame.loc[len(frame.index)] = [title_pos_score, title_neg_score, title_neu_score, title_overall_rating, text_pos_score, text_neg_score, text_neu_score, text_overall_rating, total_com_pos, total_com_neg, total_com_neu, com_overall_rating, date.strftime("%x")]
+            #frame.to_csv("out.txt", sep="\t\t\t\t")
 
 
     await reddit.close()
