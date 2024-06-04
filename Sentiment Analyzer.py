@@ -43,10 +43,14 @@ async def main():
     # Create a sentiment analyzer
     sent_analyzer = SentimentIntensityAnalyzer()
 
-    # Gets the subreddit and loads in the hot submissions into a dictionary
-    #subreddit = await reddit.Front()
+    # The subreddits to be scanned, 15 of the top subreddits, excluding those with little discussion/humor. Also 5 political subreddits, 1 neutral, 2 left, 2 right
+    subreddits = ['popular', 'askreddit', 'worldnews', 'todayilearned', 'music', 'movies', 'science', 'pics', 'news', 'askscience', 'DIY', 'books', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats', 'libertarian', 'republican', 'conservative']
+    #Most subreddits will get the top 50 posts, but since r/repbulican is smaller, it will only draw 25
+    comments_to_get = [50, 25]
+
+    # Gets the subreddit and loads in the top submissions of that day and adds them to a dataframe
     subreddit = await reddit.subreddit("politics")
-    async for submission in subreddit.top(limit=20, time_filter="day"):
+    async for submission in subreddit.top(limit=50, time_filter="day"):
         # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, commpos, comneg, comneu, comrating, date]
         title = submission.title
         print(title)
@@ -191,6 +195,8 @@ async def main():
             frame.loc[len(frame.index)] = [title_pos_score, title_neg_score, title_neu_score, title_overall_rating, text_pos_score, text_neg_score, text_neu_score, text_overall_rating, total_com_pos, total_com_neg, total_com_neu, com_overall_rating, date.strftime("%x")]
             #frame.to_csv("out.txt", sep="\t\t\t\t")
 
+# Subreddits: Popular, askreddit, worldnews, todayilearned, music, movies, science, pics, news, askscience, DIY, books, explainlikeim5, lifeprotips, sports
+    # Politic subreddits: politics, democrats, libertarian, republican, conservative
 
     await reddit.close()
 
