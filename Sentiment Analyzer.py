@@ -26,8 +26,9 @@ import datetime
 async def main():
     # The subreddits to be scanned, 15 of the top subreddits, excluding those with little discussion/humor. Also 5 political subreddits, 1 neutral, 2 left, 2 right
     subreddits = ['popular', 'askreddit', 'worldnews', 'todayilearned', 'music', 'movies', 'science', 'pics', 'news',
-                  'askscience', 'DIY', 'books', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats',
+                  'askscience', 'DIY', 'futurology', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats',
                   'libertarian', 'republican', 'conservative']
+    #popular, askreddit, worldnews, gaming, todayilearned, movies, memes, showerthoughts, pics,
 
     temp_subreddit = 'politics'
     for chosen_sub in subreddits:
@@ -39,11 +40,9 @@ async def main():
         display(frame)
         # Most subreddits will get the top 50 posts, but since r/republican is smaller, it will only draw 25
         # 10 FOR TESTING
-        limit = 10
-        if chosen_sub == "republican":
-            limit = 10
+        limit = 20
 
-        # The number of post actually being used, as we discard videos
+        # The number of post actually being used, as we discard posts with less than 5 comments
         posts_grabbed = 0
 
         # To test you must visit https://www.reddit.com/prefs/apps and create an app and input given data
@@ -59,7 +58,20 @@ async def main():
 
         # Gets the subreddit and loads in the top submissions of that day and adds them to a dataframe
         subreddit = await reddit.subreddit(chosen_sub)
-        async for submission in subreddit.top(limit=limit, time_filter="day"):
+        async for submission in subreddit.top(limit=limit, time_filter="week"):
+            # Get the submission comments
+            comments = await submission.comments()
+
+            # Check to make sure we grab a max of 50 comments
+            if posts_grabbed > 10:
+                continue
+
+            # If there is less than 5 comments, skip this submission
+            if len(comments) < 5:
+                continue
+            else:
+                posts_grabbed += 1
+
             # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, commpos, comneg, comneu, comrating, date]
             title = submission.title
             print(title)
@@ -102,14 +114,6 @@ async def main():
             com_rating_pos = 0
             com_rating_neg = 0
             com_rating_neu = 0
-
-
-
-            #https://asyncpraw.readthedocs.io/en/stable/tutorials/comments.html#extracting-comments
-
-            # Get the submission comments
-            comments = await submission.comments()
-            #await comments.replace_more(limit=0)
 
             # For a number of comments, iterate through them, recording sentiment
             i = 0
@@ -162,9 +166,6 @@ async def main():
                     print("Num of com" + str(num_com))
 
                 i += 1
-
-
-            posts_grabbed += 1
 
             print(total_com_neu)
             print(total_com_neg)
