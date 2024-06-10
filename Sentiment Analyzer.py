@@ -199,10 +199,20 @@ async def main():
             total_com_neg = round(total_com_neg, 2)
             total_com_neu = round(total_com_neu, 2)
 
+            # Compute overall submission score, 25% Title 25% body and 50% comments, unless no body, in which 50% title
+
+
             # Add row to data frame if there are enough comments
             if com_rating_neu + com_rating_neg + com_rating_pos == 5:
-                file1.write(str(title_pos_score) + "," + str(title_neg_score) + "," + str(title_neu_score) + "," + str(title_overall_rating) + "," + str(text_pos_score) + "," + str(text_neg_score) + "," + str(text_neu_score) + "," + str(text_overall_rating) + "," + str(total_com_pos) + "," + str(total_com_neg) + "," + str(total_com_neu) + "," + str(com_overall_rating) + "," + date.strftime("%x") + "\n")
-                frame.loc[len(frame.index)] = [title_pos_score, title_neg_score, title_neu_score, title_overall_rating, text_pos_score, text_neg_score, text_neu_score, text_overall_rating, total_com_pos, total_com_neg, total_com_neu, com_overall_rating, date.strftime("%x")]
+                file1.write(str(title_pos_score) + "," + str(title_neg_score) + "," + str(title_neu_score) + "," +
+                            str(title_overall_rating) + "," + str(text_pos_score) + "," + str(text_neg_score) + "," +
+                            str(text_neu_score) + "," + str(text_overall_rating) + "," + str(total_com_pos) + "," +
+                            str(total_com_neg) + "," + str(total_com_neu) + "," + str(com_overall_rating) + "," +
+                            date.strftime("%x") + "\n")
+                frame.loc[len(frame.index)] = [title_pos_score, title_neg_score, title_neu_score, title_overall_rating,
+                                               text_pos_score, text_neg_score, text_neu_score, text_overall_rating,
+                                               total_com_pos, total_com_neg, total_com_neu, com_overall_rating,
+                                               date.strftime("%x")]
                 #frame.to_csv("out.txt", sep="\t\t\t\t")
 
         # Subreddits: Popular, askreddit, worldnews, todayilearned, music, movies, science, pics, news, askscience, DIY, books, explainlikeim5, lifeprotips, sports
