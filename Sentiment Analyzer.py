@@ -13,34 +13,20 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from IPython.display import display
 import datetime
 
-
-# posts = []
-# title = []
-# selftext = []
-# pos_score = []
-# neg_score = []
-# neu_score = []
-# overall_rating = []
-# testing = []
-
 async def main():
     # The subreddits to be scanned, 15 of the top subreddits, excluding those with little discussion/humor. Also 5 political subreddits, 1 neutral, 2 left, 2 right
     subreddits = ['popular', 'askreddit', 'worldnews', 'todayilearned', 'music', 'movies', 'science', 'pics', 'news',
-                  'askscience', 'DIY', 'futurology', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats',
+                  'gaming', 'DIY', 'futurology', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats',
                   'libertarian', 'republican', 'conservative']
-    #popular, askreddit, worldnews, gaming, todayilearned, movies, memes, showerthoughts, pics,
+    
 
-    temp_subreddit = 'politics'
     for chosen_sub in subreddits:
-        # TEMP CREATE DATA FRAME
         # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, textrating,commpos, comneg, comneu, comrating, date]
         frame = pandas.DataFrame(columns=['titlepos', 'titleneg', 'titleneu', 'titlerating', 'textpos', 'textneg', 'textneu', 'textrating','commpos', 'comneg', 'comneu', 'comrating', 'date'])
-        #frame = pandas.read_parquet("politics.gzip")
         pandas.set_option("display.max_columns", None)
         display(frame)
-        # Most subreddits will get the top 50 posts, but since r/republican is smaller, it will only draw 25
-        # 10 FOR TESTING
-        limit = 20
+        # We grab 70 post but only keep 50, discarding posts with less than 5 comments
+        limit = 70
 
         # The number of post actually being used, as we discard posts with less than 5 comments
         posts_grabbed = 0
@@ -52,9 +38,9 @@ async def main():
         # Create a sentiment analyzer
         sent_analyzer = SentimentIntensityAnalyzer()
 
-        file1 = open(str(chosen_sub) + ".csv", "w")
-        # file1 = open(str(chosen_sub) + ".csv", "a")
-        file1.write("titlepos,titleneg,titleneu,titlerating,textpos,textneg,textneu,textrating,commpos,comneg,comneu,comrating,date\n")
+        # file1 = open(str(chosen_sub) + ".csv", "w")
+        file1 = open(str(chosen_sub) + ".csv", "a")
+        #file1.write("titlepos,titleneg,titleneu,titlerating,textpos,textneg,textneu,textrating,commpos,comneg,comneu,comrating,date\n")
 
         # Gets the subreddit and loads in the top submissions of that day and adds them to a dataframe
         subreddit = await reddit.subreddit(chosen_sub)
@@ -62,8 +48,8 @@ async def main():
             # Get the submission comments
             comments = await submission.comments()
 
-            # Check to make sure we grab a max of 50 comments
-            if posts_grabbed > 10:
+            # Check to make sure we grab a max of 50 posts
+            if posts_grabbed > 50:
                 continue
 
             # If there is less than 5 comments, skip this submission
@@ -104,8 +90,6 @@ async def main():
                 text_neg_score = pandas.NA
                 text_overall_rating = pandas.NA
 
-            #comment_neu_avg =
-
             num_com = 5
             grabbed_com = 0
             total_com_pos = 0
@@ -118,8 +102,6 @@ async def main():
             # For a number of comments, iterate through them, recording sentiment
             i = 0
             while (i < num_com and i < len(comments)):
-            #for i in num_com:
-                #TESTING REMOVE LATER
                 com_overall_rating = ""
 
                 top_level_comment = comments[i]
@@ -174,8 +156,6 @@ async def main():
             total_com_neg = total_com_neg/5.0
             total_com_neu = total_com_neu/5.0
 
-
-            # [titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, textrating, commpos, comneg, comneu, comrating, date]
             # Loop adding rows to data frame
             print(com_rating_pos)
             print(com_rating_neg)
@@ -183,7 +163,6 @@ async def main():
 
             # Create date object
             date = datetime.datetime.now()
-            #print(date.strftime("%x"))
 
             # Rounding values
             title_pos_score = round(title_pos_score, 2)
@@ -199,9 +178,6 @@ async def main():
             total_com_neg = round(total_com_neg, 2)
             total_com_neu = round(total_com_neu, 2)
 
-            # Compute overall submission score, 25% Title 25% body and 50% comments, unless no body, in which 50% title
-
-
             # Add row to data frame if there are enough comments
             if com_rating_neu + com_rating_neg + com_rating_pos == 5:
                 file1.write(str(title_pos_score) + "," + str(title_neg_score) + "," + str(title_neu_score) + "," +
@@ -213,14 +189,11 @@ async def main():
                                                text_pos_score, text_neg_score, text_neu_score, text_overall_rating,
                                                total_com_pos, total_com_neg, total_com_neu, com_overall_rating,
                                                date.strftime("%x")]
-                #frame.to_csv("out.txt", sep="\t\t\t\t")
 
         # Subreddits: Popular, askreddit, worldnews, todayilearned, music, movies, science, pics, news, askscience, DIY, books, explainlikeim5, lifeprotips, sports
         # Politic subreddits: politics, democrats, libertarian, republican, conservative
 
         await reddit.close()
-        frame.to_parquet(str(chosen_sub) + ".gzip", compression='GZIP')
-
         display(frame)
         file1.close()
 

@@ -5,9 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas
 
-subreddits = ['popular', 'askreddit', 'worldnews', 'todayilearned', 'music', 'movies', 'science', 'pics', 'news',
-                  'askscience', 'DIY', 'futurology', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats',
-                  'libertarian', 'republican', 'conservative']
+#subreddits = ['popular', 'askreddit', 'worldnews', 'todayilearned', 'music', 'movies', 'science', 'pics', 'news',
+#                  'askscience', 'DIY', 'futurology', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats',
+ #                 'libertarian', 'republican', 'conservative']
+
+subreddits = ['askreddit']
 
 # Bar plot with average %pos %neg and %neu per subreddit
 complete_frame = pandas.DataFrame(columns=["Subreddit", "Title Positive", "Title Negative", "Title Neutral", "Comment Positive",
@@ -32,9 +34,11 @@ plt.show()
 
 # Second graph
 complete_frame = pandas.DataFrame(columns=["Date", "Percent Positive", "Percent Negative", "Percent Neutral"])
-chosen_sub = "test"
-#new_frame = pandas.read_parquet(str(chosen_sub + ".gzip"))
-new_frame = pandas.read_csv(str(chosen_sub + ".csv"))
+#chosen_sub = "test"
+chosen_sub = "askreddit"
+new_frame = pandas.read_parquet(str(chosen_sub + ".gzip"))
+print(new_frame)
+#new_frame = pandas.read_csv(str(chosen_sub + ".csv"))
 
 # Initialize the sums
 pos_sum = 0
