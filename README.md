@@ -1,0 +1,16 @@
+The goal of this project is to chart the sentiment of Reddit posts and comments overtime as the US Presidential election draws near. Using the VADER API, I rate the positivity, negativity, and neutrality of posts and record data.
+Here I am going to go over my program, what decisions I made, and why.
+
+To start, I had to choose a selection of the topmost subreddits that would have enought posts generated and wouldn't introduce unwanted results. I filtered out most of the humor subreddits (such as r/Jokes) becuase the wordplay, sarcasm, and conflicting nature of the posts and comments wouldn't be helpful to my overall goal. Alongside that, I filtered out subreddits that were mostly pictures and had little discussion occuring, such as r/Food because they provided little info and most posts were strictly positive. I also made sure to get the largest political subreddits from both parties. This lead me to my final list of:
+'popular', 'askreddit', 'worldnews', 'todayilearned', 'music', 'movies', 'science', 'pics', 'news', 'askscience', 'DIY', 'futurology', 'explainlikeimfive', 'lifeprotips', 'sports', 'politics', 'democrats', 'libertarian', 'republican', 'conservative.'
+
+I loop through this list and using the AsyncPraw API, I retreive each subreddit and grab 70 posts. I only end up using 50 of them, and the extra 20 are there to buffer in case a post has less than 5 comments, in which case it gets discarded.
+
+I chose 50 posts for a multitude of reasons. Namely the smallest subreddits on this list (r/Republican) have, at max, a little over 50 posts a week. I wanted to keep the numbers consistant, so I let my boundary be decided this way. I also initally was going to grab posts every day, but smaller subreddits had very few posts daily, and there was no guarantee they hit the 5 needed comments. I wanted 5 comments to create a larger data pool and not have the outcome of a post be decided by a singlular comment.
+
+I then grab the 50 submissions and rate the title, comments, and if it has it, the body text. I record the body text and title's positive, negative, and neutral score, along with their overall rating of "Positive", "Negative", or "Neutral." For comments, I start by taking the top 5 comments, excluding the Automoderator. If the majority (>3) comments share the same sentiment, I record that as the prevailing sentiment. I also take the average of the sentiment scores, and record those too. If there are two neutral and 2 positive or negative comments, choose the positive or negative sentiment rating to record. For example two neutral comments, two positive comments, and one negative comment will be recorded as overall positive. I did this to prefer stronger sentiments in posts to make it easier to see potential trends in data. If there is a split between positive and negative ratings, choose the rating that has a higher neumerical score.
+
+Once all this data is collected, I store it in a csv file, ultimatly recording:
+titlepos, titleneg, titleneu, titlerating, textpos, textneg, textneu, textrating, commpos, comneg, comneu, comrating, date.
+
+I wrote a few small functions with matplotlib to visualize the data, but as I am taking a course this semester on data visualization, I will leave it be for now. Data is collected roughly every week on Wednesday, and I hope to continue it until December.
