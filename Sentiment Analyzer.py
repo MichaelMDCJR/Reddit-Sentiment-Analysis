@@ -32,8 +32,8 @@ async def main():
         posts_grabbed = 0
 
         # To test you must visit https://www.reddit.com/prefs/apps and create an app and input given data
-        reddit = asyncpraw.Reddit(client_id="4Syw9pcj_BDUfI4hFWgAmA", client_secret="9puNtYpDqdszRoM1paJjnf3uT3VizQ",
-                              user_agent="MC Scraper")
+        reddit = asyncpraw.Reddit(client_id="----------------", client_secret="---------------",
+                              user_agent="------------")
 
         # Create a sentiment analyzer
         sent_analyzer = SentimentIntensityAnalyzer()
